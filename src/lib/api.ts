@@ -9,7 +9,25 @@ import type { ContactValues } from './validation/contact'
 /*  sentence rather than an axios message about status codes.                  */
 /* -------------------------------------------------------------------------- */
 
-const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost:4000'
+/*
+ * The deployed API is the default on purpose.
+ *
+ * .env is gitignored, so a build host that was never given VITE_API_URL would
+ * otherwise fall back to localhost — which exists on nobody's machine but mine
+ * and makes every visitor's submission fail with a connection refused. Point
+ * VITE_API_URL at localhost when working on the backend; leaving it unset has
+ * to produce something that works.
+ */
+const DEFAULT_API_URL = 'https://service-production-696e.up.railway.app'
+
+/*
+ * SERVICE_API_URL first, VITE_API_URL second. Both are read because Vercel
+ * would not take the VITE_ name; either works, and neither is required.
+ * See envPrefix in vite.config.ts.
+ */
+const configured = import.meta.env.SERVICE_API_URL ?? import.meta.env.VITE_API_URL
+
+const baseURL = (configured?.trim() || DEFAULT_API_URL).replace(/\/+$/, '')
 
 const client = axios.create({
   baseURL,
