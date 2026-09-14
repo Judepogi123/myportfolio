@@ -17,7 +17,7 @@ const results = []
 const fail = (name, detail) => results.push(`FAIL ${name} — ${detail}`)
 const pass = (name, detail = '') => results.push(`ok   ${name} ${detail}`)
 
-const SECTIONS = ['about', 'work', 'problems', 'toolkit', 'contact']
+const SECTIONS = ['about', 'work', 'problems', 'projects', 'toolkit', 'contact']
 
 /* ------------------------------------------------------- desktop journey -- */
 {
@@ -78,6 +78,32 @@ const SECTIONS = ['about', 'work', 'problems', 'toolkit', 'contact']
   progress !== null && progress > 0.05
     ? pass('progress: indicator advances with scroll', `scaleX=${progress?.toFixed(2)}`)
     : fail('progress: indicator advances with scroll', `scaleX=${progress}`)
+
+  // Project cards must visibly react to a pointer: the cover motif takes the
+  // accent colour and the border lifts. Easy to lose to a typo'd class.
+  {
+    const card = page.locator('#projects li .group').nth(1)
+    await card.scrollIntoViewIfNeeded()
+    await page.waitForTimeout(400)
+    const read = () =>
+      card.evaluate((el) => ({
+        border: getComputedStyle(el).borderTopColor,
+        motif: getComputedStyle(el.querySelector('svg')).color,
+      }))
+    const resting = await read()
+    await card.hover()
+    await page.waitForTimeout(800)
+    const hovered = await read()
+
+    hovered.border !== resting.border && hovered.motif !== resting.motif
+      ? pass('projects: card reacts to hover')
+      : fail(
+          'projects: card reacts to hover',
+          `border ${resting.border} -> ${hovered.border}, motif ${resting.motif} -> ${hovered.motif}`,
+        )
+
+    await page.mouse.move(0, 0)
+  }
 
   // Theme toggle flips the root class and persists.
   const before = await page.evaluate(() => document.documentElement.className)

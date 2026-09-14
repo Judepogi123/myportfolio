@@ -42,8 +42,9 @@ export const navItems: NavItem[] = [
   { index: '01', id: 'about',    label: 'About' },
   { index: '02', id: 'work',     label: 'Work' },
   { index: '03', id: 'problems', label: 'Problems' },
-  { index: '04', id: 'toolkit',  label: 'Toolkit' },
-  { index: '05', id: 'contact',  label: 'Contact' },
+  { index: '04', id: 'projects', label: 'Projects' },
+  { index: '05', id: 'toolkit',  label: 'Toolkit' },
+  { index: '06', id: 'contact',  label: 'Contact' },
 ]
 
 /* ----------------------------------------------------------------- about -- */
@@ -166,6 +167,79 @@ export const projects: Project[] = [
       },
     ],
     stack: ['React', 'TypeScript', 'Fastify', 'Prisma', 'PostgreSQL', 'Expo', 'SQLite', 'Zustand'],
+  },
+]
+
+/* --------------------------------------------------- personal projects -- */
+
+export type PersonalProject = {
+  id: string
+  name: string
+  year: string
+  status: 'Live' | 'In progress' | 'Prototype'
+  /** Which line-art cover to draw — see ProjectCover. */
+  motif: 'device' | 'ledger' | 'form' | 'sync' | 'feed'
+  /** Drop a screenshot in public/projects/ and point at it, e.g. '/projects/giams.png'. */
+  cover?: string
+  /** Optional repo or demo. Leave out and the card renders without a link. */
+  href?: string
+  blurb: string
+  stack: string[]
+  /** The first project gets the wide card. */
+  featured?: boolean
+}
+
+export const personalProjects: PersonalProject[] = [
+  {
+    id:       'mockup-studio',
+    name:     'Mobile Mockup Studio',
+    year:     '2026',
+    status:   'In progress',
+    motif:    'device',
+    featured: true,
+    blurb:
+      'Animated device-mockup videos rendered and encoded entirely in the browser — phone frames in real 3D, keyframed motion, and an MP4 that never leaves the machine. No upload, no render queue, no server to pay for.',
+    stack: ['React', 'Three.js', 'WebCodecs', 'mp4-muxer', 'ffmpeg.wasm', 'Supabase'],
+  },
+  {
+    id:     'giams',
+    name:   'GIAMS',
+    year:   '2026',
+    status: 'In progress',
+    motif:  'ledger',
+    blurb:
+      'A double-entry ledger for a municipal accounting office, written to the COA Government Accounting Manual for LGUs — with the balance invariants enforced by the database rather than trusted to the app.',
+    stack: ['Tauri', 'Rust', 'PostgreSQL', 'TypeScript'],
+  },
+  {
+    id:     'form-builder',
+    name:   'Barangay Forms',
+    year:   '2026',
+    status: 'Live',
+    motif:  'form',
+    blurb:
+      'The municipality designs a form once and publishes it to every barangay, then watches who has filled it in, signed it and acknowledged it — with announcements and messaging in the same place.',
+    stack: ['React', 'dnd-kit', 'pdf-lib', 'pdf.js', 'Supabase', 'Recharts'],
+  },
+  {
+    id:     'inventory',
+    name:   'Stockroom',
+    year:   '2026',
+    status: 'Prototype',
+    motif:  'sync',
+    blurb:
+      'Counting stock on a phone that may have no signal: a SQLite mirror of the cloud database on the device, a queue for everything done offline, and a reconcile pass that cannot double a movement.',
+    stack: ['Expo', 'Drizzle ORM', 'SQLite', 'Supabase', 'TanStack Query'],
+  },
+  {
+    id:     'akp2026',
+    name:   'AKP',
+    year:   '2026',
+    status: 'In progress',
+    motif:  'feed',
+    blurb:
+      'A members-only space for a local organisation — an activity feed, a directory that groups members by town and barangay, and profiles people actually keep up to date.',
+    stack: ['Expo SDK 57', 'Expo Router', 'Supabase', 'Zustand', 'Zod'],
   },
 ]
 

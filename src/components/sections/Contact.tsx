@@ -63,7 +63,7 @@ export function Contact() {
       <div className="relative mx-auto w-full max-w-6xl px-5 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-28">
         <Reveal>
           <div className="flex items-center gap-3">
-            <span className="label">05</span>
+            <span className="label">06</span>
             <span aria-hidden className="h-px flex-1 bg-line sm:max-w-24" />
           </div>
 

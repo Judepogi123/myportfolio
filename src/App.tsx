@@ -5,6 +5,7 @@ import { Hero } from '@/components/sections/Hero'
 import { About } from '@/components/sections/About'
 import { Work } from '@/components/sections/Work'
 import { Problems } from '@/components/sections/Problems'
+import { Projects } from '@/components/sections/Projects'
 import { Toolkit } from '@/components/sections/Toolkit'
 import { Contact } from '@/components/sections/Contact'
 
@@ -19,6 +20,7 @@ export default function App() {
         <About />
         <Work />
         <Problems />
+        <Projects />
         <Toolkit />
         <Contact />
       </main>
