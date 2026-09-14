@@ -1,6 +1,7 @@
 import { ArrowUpRight, Copy, Check } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Reveal } from '@/components/ui/Reveal'
+import { ContactForm } from '@/components/contact/ContactForm'
 import { contactLinks, identity } from '@/data/profile'
 
 function CopyEmailButton() {
@@ -71,28 +72,43 @@ export function Contact() {
             Have something that has to work
             <span className="text-ink-faint"> every working day?</span>
           </h2>
-
-          <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-muted">
-            I am open to remote work and happy to talk through a system you are
-            planning, inheriting, or trying to rescue.
-          </p>
         </Reveal>
 
-        <Reveal delay={0.1}>
-          <div className="mt-10 flex flex-wrap items-center gap-3">
-            <a
-              href={`mailto:${identity.email}`}
-              className="group inline-flex items-center gap-2 rounded-xl border border-ink bg-ink px-5 py-2.5 text-sm font-medium text-canvas transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:gap-3 hover:border-accent hover:bg-accent"
-            >
-              Send an email
-              <ArrowUpRight
-                aria-hidden
-                className="size-4 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-              />
-            </a>
-            <CopyEmailButton />
+        <div className="mt-10 grid gap-10 lg:grid-cols-12 lg:gap-14">
+          <div className="lg:col-span-5">
+            <Reveal delay={0.06}>
+              <p className="max-w-md text-lg leading-relaxed text-ink-muted">
+                I am open to remote work and happy to talk through a system you
+                are planning, inheriting, or trying to rescue.
+              </p>
+
+              <p className="mt-4 max-w-md text-base leading-relaxed text-ink-muted">
+                Tell me roughly what you need and I will come back with whether
+                I am the right person for it — and if I am not, who might be.
+              </p>
+
+              <div className="mt-7 flex flex-wrap items-center gap-3">
+                <a
+                  href={`mailto:${identity.email}`}
+                  className="group inline-flex items-center gap-2 rounded-xl border border-line bg-surface px-4 py-2.5 text-sm font-medium text-ink transition-colors duration-200 hover:border-line-strong hover:bg-raised"
+                >
+                  Email instead
+                  <ArrowUpRight
+                    aria-hidden
+                    className="size-4 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  />
+                </a>
+                <CopyEmailButton />
+              </div>
+            </Reveal>
           </div>
-        </Reveal>
+
+          <div className="lg:col-span-7">
+            <Reveal delay={0.12}>
+              <ContactForm />
+            </Reveal>
+          </div>
+        </div>
 
         <Reveal delay={0.16}>
           <dl className="mt-14 grid gap-px bg-line sm:grid-cols-3">

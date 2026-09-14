@@ -42,6 +42,12 @@
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
   --color-accent-line: var(--accent-line);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-line: var(--danger-line);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-line: var(--success-line);
 }
 
 :root {
@@ -56,6 +62,14 @@
   --accent: #1f5fd0;
   --accent-soft: #eef3fd;
   --accent-line: #c8daf7;
+
+  --danger: #b4342a;
+  --danger-soft: #fdf1f0;
+  --danger-line: #f0cdc9;
+
+  --success: #1f7a52;
+  --success-soft: #eff8f3;
+  --success-line: #c6e5d5;
 
   --grid-dot: rgba(22, 23, 26, 0.11);
 }
@@ -72,6 +86,14 @@
   --accent: #7aa2ff;
   --accent-soft: rgba(122, 162, 255, 0.1);
   --accent-line: rgba(122, 162, 255, 0.28);
+
+  --danger: #ff8c82;
+  --danger-soft: rgba(255, 140, 130, 0.1);
+  --danger-line: rgba(255, 140, 130, 0.28);
+
+  --success: #62c795;
+  --success-soft: rgba(98, 199, 149, 0.1);
+  --success-line: rgba(98, 199, 149, 0.28);
 
   --grid-dot: rgba(236, 238, 241, 0.09);
 }

@@ -105,6 +105,46 @@ const SECTIONS = ['about', 'work', 'problems', 'projects', 'toolkit', 'contact']
     await page.mouse.move(0, 0)
   }
 
+  /*
+   * The contact form must validate in the browser before it ever calls the
+   * API, and must say so in plain language. Submitting empty sends nothing.
+   */
+  {
+    await page.locator('a[href="#contact"]').first().click()
+    await page.waitForTimeout(900)
+    await page.getByRole('button', { name: 'Send message' }).click()
+    await page.waitForTimeout(700)
+
+    const state = await page.evaluate(() => {
+      const form = document.querySelector('#contact form')
+      return {
+        invalid: [...form.querySelectorAll('[aria-invalid="true"]')].map((el) => el.id),
+        messages: [...form.querySelectorAll('p')]
+          .map((p) => p.textContent.trim())
+          .filter((t) => t && t.length < 140),
+        honeypotVisible: (() => {
+          const pot = document.getElementById('website')
+          if (!pot) return 'missing'
+          return pot.getBoundingClientRect().right > 0
+        })(),
+      }
+    })
+
+    const flagged = ['name', 'email', 'message'].every((id) => state.invalid.includes(id))
+    const readable = !state.messages.some((m) => /required|invalid|string|expected/i.test(m))
+
+    flagged && readable
+      ? pass('contact: empty submit is caught in the browser, in plain language')
+      : fail(
+          'contact: empty submit is caught in the browser',
+          `invalid=${state.invalid.join(',')} messages=${state.messages.join(' | ')}`,
+        )
+
+    state.honeypotVisible === false
+      ? pass('contact: honeypot stays off-screen')
+      : fail('contact: honeypot stays off-screen', String(state.honeypotVisible))
+  }
+
   // Theme toggle flips the root class and persists.
   const before = await page.evaluate(() => document.documentElement.className)
   await page.getByRole('button', { name: /Switch to .* theme/ }).click()
