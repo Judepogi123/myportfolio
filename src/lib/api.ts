@@ -57,8 +57,22 @@ export async function submitEnquiry(values: ContactValues): Promise<SubmitResult
       }
     }
 
-    /* No response at all — offline, DNS, or the service is down. */
+    /*
+     * No response at all. Genuinely offline, or — far more often in
+     * development — the browser threw the response away because the API did
+     * not allow this origin. The two are indistinguishable from here by
+     * design, so leave a pointer in the console rather than guessing at the
+     * visitor's expense.
+     */
     if (!error.response) {
+      if (import.meta.env.DEV) {
+        console.warn(
+          `[contact] No response from ${baseURL}. If the API is running, this is ` +
+            `almost certainly CORS: origin "${window.location.origin}" is not on its ` +
+            `ALLOWED_ORIGINS list.`,
+        )
+      }
+
       return {
         ok: false,
         message: 'I could not reach the server. Please try again in a moment, or email me directly.',
