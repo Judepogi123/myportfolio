@@ -37,9 +37,7 @@ export function Footer() {
             <span aria-hidden className="mx-2 hidden sm:inline">
               ·
             </span>
-            <span className="mt-1 block sm:mt-0 sm:inline">
-              React, Vite and Tailwind CSS
-            </span>
+            <span className="mt-1 block sm:mt-0 sm:inline">{identity.tagline}</span>
           </p>
 
           <button

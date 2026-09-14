@@ -11,6 +11,8 @@ export type Identity = {
   phone: string
   city: string
   availability: string
+  /** Sits beside the copyright in the footer. */
+  tagline: string
   headline: string
   lead: string
 }
@@ -26,6 +28,7 @@ export const identity: Identity = {
   phone:        '+63 930 432 0169',
   city:         'Boac, Marinduque, Philippines',
   availability: 'Open to remote work',
+  tagline:      'Full-stack developer — web, mobile and desktop',
   headline:     'I build software a town opens every morning.',
   lead:
     "I'm Jude — a full-stack developer in Marinduque, Philippines. For the past year I've been the only engineer on the system the Municipality of Gasan runs on: a portal for the offices, an app for phones, and two Windows programs that keep working when the connection doesn't.",
