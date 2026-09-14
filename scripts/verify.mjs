@@ -106,6 +106,76 @@ const SECTIONS = ['about', 'work', 'problems', 'projects', 'toolkit', 'contact']
   }
 
   /*
+   * Collapsible sections. The trap here is a panel that is visually closed but
+   * still in the accessibility tree — screen readers read it, Tab lands in it,
+   * ctrl+F finds it. Every closed panel must be inert, every open one must not.
+   */
+  {
+    const audit = () =>
+      page.evaluate(() =>
+        [...document.querySelectorAll('button[aria-expanded]')].map((button) => {
+          const panel = document.getElementById(button.getAttribute('aria-controls') ?? '')
+          return {
+            label: (button.textContent ?? '').trim().slice(0, 32),
+            open: button.getAttribute('aria-expanded') === 'true',
+            panelMissing: !panel,
+            inert: panel?.hasAttribute('inert') ?? false,
+          }
+        }),
+      )
+
+    const atRest = await audit()
+    const broken = atRest.filter((row) => row.panelMissing || row.open === row.inert)
+
+    atRest.length > 0 && broken.length === 0
+      ? pass('disclosure: closed panels are inert, open ones are not', `${atRest.length} panels`)
+      : fail(
+          'disclosure: closed panels are inert',
+          broken.map((row) => `${row.label} open=${row.open} inert=${row.inert}`).join(' | ') ||
+            'no collapsible panels found at all',
+        )
+
+    /*
+     * Open and close one, then re-audit — an interrupted animation used to
+     * leave a zero-height panel behind.
+     *
+     * Addressed by position, not by state: a selector like
+     * [aria-expanded="false"] stops matching the moment it is clicked, so the
+     * second click would land on a different element entirely.
+     */
+    const first = page.locator('#work button[aria-expanded]').nth(1)
+    await first.scrollIntoViewIfNeeded()
+    await first.click()
+    await page.waitForTimeout(600)
+    const opened = await first.getAttribute('aria-expanded')
+    await first.click()
+    await page.waitForTimeout(900)
+    const closed = await first.getAttribute('aria-expanded')
+
+    const afterToggle = await audit()
+    const leaked = afterToggle.filter((row) => row.panelMissing || row.open === row.inert)
+
+    opened === 'true' && closed === 'false' && leaked.length === 0
+      ? pass('disclosure: opens, closes, and leaves nothing behind')
+      : fail(
+          'disclosure: opens, closes, and leaves nothing behind',
+          `opened=${opened} closed=${closed} leaked=${leaked.length}`,
+        )
+
+    // Keyboard operable — it is a real button, so Enter must work.
+    await first.focus()
+    await page.keyboard.press('Enter')
+    await page.waitForTimeout(500)
+    const viaKeyboard = await first.getAttribute('aria-expanded')
+    viaKeyboard === 'true'
+      ? pass('disclosure: opens from the keyboard')
+      : fail('disclosure: opens from the keyboard', `aria-expanded=${viaKeyboard}`)
+
+    await first.click()
+    await page.waitForTimeout(500)
+  }
+
+  /*
    * The contact form must validate in the browser before it ever calls the
    * API, and must say so in plain language. Submitting empty sends nothing.
    */

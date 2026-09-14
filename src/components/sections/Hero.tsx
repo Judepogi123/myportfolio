@@ -24,17 +24,17 @@ export function Hero() {
 
       <div className="relative mx-auto w-full max-w-6xl px-5 pb-18 pt-18 sm:px-8 sm:pb-24 sm:pt-24 lg:px-12 lg:pb-28 lg:pt-28">
         <motion.p {...rise(0)} className="label">
-          {identity.role} · Philippines
+          {identity.role} · Web, mobile &amp; desktop
         </motion.p>
 
         <motion.h1
           {...rise(0.08)}
           className="mt-6 max-w-4xl text-[2.125rem] font-medium leading-[1.06] tracking-[-0.035em] text-ink sm:text-5xl sm:leading-[1.04] sm:tracking-[-0.038em] lg:text-6xl"
         >
-          I build software a town
+          I build systems that
           <br className="hidden sm:block" />{' '}
           <span className="relative inline-block">
-            opens every morning
+            have to keep working
             <motion.span
               aria-hidden
               initial={{ scaleX: 0 }}
@@ -54,6 +54,13 @@ export function Hero() {
           className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-muted"
         >
           {identity.lead}
+        </motion.p>
+
+        <motion.p
+          {...rise(0.22)}
+          className="mt-4 max-w-2xl text-base leading-relaxed text-ink-faint"
+        >
+          {identity.proof}
         </motion.p>
 
         <motion.div {...rise(0.26)} className="mt-10 flex flex-wrap items-center gap-3">

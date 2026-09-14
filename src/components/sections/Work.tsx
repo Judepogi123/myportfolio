@@ -1,3 +1,4 @@
+import { Disclosure } from '@/components/ui/Disclosure'
 import { Reveal } from '@/components/ui/Reveal'
 import { Section } from '@/components/ui/Section'
 import { Tag } from '@/components/ui/Tag'
@@ -60,27 +61,23 @@ function ProjectEntry({ project, index }: { project: Project; index: number }) {
             </p>
           </Reveal>
 
-          <ul className="mt-10">
+          {/*
+            Titles stay visible, detail folds away. The titles are the summary
+            — leaving five paragraphs open at once buried them.
+          */}
+          <div className="mt-10">
             {project.highlights.map((highlight, i) => (
-              <Reveal as="li" key={highlight.title} delay={0.04 + i * 0.05} y={16}>
-                <div className="group border-t border-line py-6 transition-colors duration-300">
-                  <div className="flex gap-4 sm:gap-6">
-                    <span className="mt-0.5 font-mono text-xs text-ink-faint transition-colors duration-300 group-hover:text-accent">
-                      {index + 1}.{i + 1}
-                    </span>
-                    <div className="min-w-0">
-                      <h4 className="text-base font-medium text-ink sm:text-lg">
-                        {highlight.title}
-                      </h4>
-                      <p className="mt-2 max-w-2xl text-base leading-relaxed text-ink-muted transition-colors duration-300 group-hover:text-ink">
-                        {highlight.body}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+              <Reveal key={highlight.title} delay={0.04 + i * 0.05} y={16}>
+                <Disclosure
+                  title={highlight.title}
+                  marker={`${index + 1}.${i + 1}`}
+                  defaultOpen={i === 0}
+                >
+                  <p className="max-w-2xl">{highlight.body}</p>
+                </Disclosure>
               </Reveal>
             ))}
-          </ul>
+          </div>
         </div>
       </div>
     </article>

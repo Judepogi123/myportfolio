@@ -1,10 +1,16 @@
 import { Section } from '@/components/ui/Section'
+import { Disclosure } from '@/components/ui/Disclosure'
 import { Reveal } from '@/components/ui/Reveal'
 import { about } from '@/data/profile'
 
 export function About() {
   return (
-    <Section id="about" index="01" title="How I work">
+    <Section
+      id="about"
+      index="01"
+      title="How I work"
+      lead="Full-stack, end to end — and comfortable being the person accountable for whether it holds up."
+    >
       <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-7">
           <Reveal>
@@ -38,7 +44,7 @@ export function About() {
         </div>
 
         <div className="lg:col-span-5">
-          <Reveal delay={0.1}>
+          <Reveal delay={0.1} className="lg:sticky lg:top-8">
             <dl className="divide-y divide-line rounded-2xl border border-line bg-surface/60">
               {about.facts.map((row) => (
                 <div key={row.term} className="px-5 py-4">
@@ -51,6 +57,33 @@ export function About() {
               ))}
             </dl>
           </Reveal>
+        </div>
+      </div>
+
+      {/* Range, stated plainly — the part a résumé bullet list buries. */}
+      <div className="mt-16 border-t border-line pt-10 sm:mt-20 sm:pt-12">
+        <Reveal>
+          <div className="flex items-baseline gap-3">
+            <h3 className="text-lg font-medium tracking-[-0.015em] text-ink">
+              What I take on
+            </h3>
+            <span aria-hidden className="h-px flex-1 bg-line" />
+          </div>
+        </Reveal>
+
+        {/* Six headings read in a glance; the evidence for each is one tap away. */}
+        <div className="mt-6 grid gap-x-12 sm:grid-cols-2">
+          {about.capabilities.map((capability, i) => (
+            <Reveal key={capability.title} delay={i * 0.04} y={14}>
+              <Disclosure
+                title={capability.title}
+                marker={String(i + 1).padStart(2, '0')}
+                className="h-full"
+              >
+                <p className="max-w-lg">{capability.body}</p>
+              </Disclosure>
+            </Reveal>
+          ))}
         </div>
       </div>
     </Section>

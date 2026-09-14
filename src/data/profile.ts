@@ -15,6 +15,7 @@ export type Identity = {
   tagline: string
   headline: string
   lead: string
+  proof: string
 }
 
 /* Set VITE_CONTACT_EMAIL in .env to change the address everywhere it appears. */
@@ -26,12 +27,15 @@ export const identity: Identity = {
   role:         'Full-Stack Developer',
   email:        CONTACT_EMAIL,
   phone:        '+63 930 432 0169',
-  city:         'Boac, Marinduque, Philippines',
-  availability: 'Open to remote work',
+  city:         'Philippines · GMT+8',
+  availability: 'Working remotely with teams anywhere',
   tagline:      'Full-stack developer — web, mobile and desktop',
-  headline:     'I build software a town opens every morning.',
+  headline:     'I build systems that have to keep working.',
   lead:
-    "I'm Jude — a full-stack developer in Marinduque, Philippines. For the past year I've been the only engineer on the system the Municipality of Gasan runs on: a portal for the offices, an app for phones, and two Windows programs that keep working when the connection doesn't.",
+    "I'm Jude — a full-stack developer across web, mobile and desktop. I design multi-tenant platforms, offline-first apps and cryptographic document pipelines, and I own them end to end: schema, API, interface, tests, release, and the call when something breaks at eight in the morning.",
+  /** Second paragraph of the hero — the proof behind the claim above. */
+  proof:
+    'Most recently as the sole engineer on a platform serving nine departments from one API across three client applications, hardened after a security review and released on its own pipeline.',
 }
 
 /* ------------------------------------------------------------------- nav -- */
@@ -51,28 +55,55 @@ export const navItems: NavItem[] = [
 
 export const about = {
   paragraphs: [
-    "Most of what I've built is used by people who didn't get to choose it. A clerk at a pharmacy counter. A department head signing a memo. A survey team two hours from the nearest signal. They open it because it's the tool — which changes what finished has to mean.",
-    "So I take the whole line: the schema, the server, the interface, the tests, the release, and the call at eight in the morning when something is wrong. I'd rather ship one thing that survives a bad day than five that only demo well.",
+    "Most of what I've built is used by people who didn't get to choose it — staff at a counter, a manager approving something, a field team with no signal. Software nobody opted into has to be right the first time, because there is no churning away from it and no workaround to fall back on.",
+    "So I take the whole line: the data model, the API, the interface, the tests, the release pipeline, and the call at eight in the morning when something is wrong. I'd rather ship one thing that survives a bad day than five that only survive a demo.",
   ],
   principles: [
     {
-      title: 'Offline is a requirement, not a feature',
-      body: 'A counter cannot stop serving people because the line went down. What I build keeps working unplugged and reconciles by record identity, so nothing doubles when it comes back.',
+      title: 'Correctness before cleverness',
+      body: 'Sync reconciles by record identity, money-shaped invariants live in the database rather than the app, and signature geometry is stored as fractions so two renderers cannot disagree. The interesting part is usually where a shortcut would have been silent.',
     },
     {
       title: 'Verified, not assumed',
-      body: 'Around 1,100 assertions across 54 files run against a real database before a release goes out. Security fixes get confirmed against production, not marked done in a ticket.',
+      body: 'Around 1,100 assertions across 54 files run against a real database before a release goes out, and security fixes are confirmed against production rather than marked done in a ticket.',
     },
     {
-      title: 'Plain language, all the way down',
-      body: 'No stack traces in front of a clerk. An error says what went wrong and what to do next — the same care the schema gets.',
+      title: 'Built for the worst conditions, not the best',
+      body: 'Bad connections, half-applied migrations, interrupted downloads, a provider having an outage — these are the normal case, and the design assumes them instead of apologising for them.',
+    },
+  ],
+  /** What I can be handed. The point of this section: range, stated plainly. */
+  capabilities: [
+    {
+      title: 'Multi-tenant platforms',
+      body: 'One deployment serving separate organisations whose records must never meet, with scoping enforced on the server rather than in the interface.',
+    },
+    {
+      title: 'Offline-first sync',
+      body: 'On-device SQLite mirrors, write queues and reconciliation by identity — proven across 28,899 records with none duplicated and none lost.',
+    },
+    {
+      title: 'Documents & e-signature',
+      body: 'Server-side PDF rendering, signature placement that cannot drift between preview and print, and Ed25519 attestation any recipient can verify without an account.',
+    },
+    {
+      title: 'Cross-platform delivery',
+      body: 'One API behind a web portal, iOS and Android, and Windows desktop — each with its own release channel, from a single source of truth.',
+    },
+    {
+      title: 'Security hardening',
+      body: 'Led a review that closed 48 endpoints trusting client-supplied identity, and shut unauthenticated access to account, admin and personal-data routes.',
+    },
+    {
+      title: 'Release engineering',
+      body: 'End-to-end suites against a real database, signed auto-update channels, and deploys I own rather than hand over.',
     },
   ],
   facts: [
-    { term: 'Currently',  detail: 'Municipality of Gasan',        sub: 'Sole developer · 2026 – present' },
-    { term: 'Education',  detail: 'BS Information Technology',    sub: 'Major in Software Development' },
-    { term: 'Based in',   detail: 'Marinduque, Philippines',      sub: 'GMT+8 · open to remote' },
-    { term: 'Languages',  detail: 'English, Filipino',            sub: 'Written and spoken' },
+    { term: 'Currently',  detail: 'Sole engineer, government platform', sub: 'Nine departments, three client apps' },
+    { term: 'Education',  detail: 'BS Information Technology',          sub: 'Major in Software Development' },
+    { term: 'Based in',   detail: 'Philippines · GMT+8',                sub: 'Remote, across time zones' },
+    { term: 'Languages',  detail: 'English, Filipino',                  sub: 'Written and spoken' },
   ],
 }
 
@@ -98,51 +129,52 @@ export type Project = {
 export const projects: Project[] = [
   {
     id:      'gasan',
-    name:    'Municipal Information System',
-    client:  'Municipality of Gasan, Marinduque',
+    name:    'Multi-tenant Government Platform',
+    client:  'Municipality of Gasan · Philippines',
     period:  '2026 — Present',
     status:  'current',
-    role:    'Sole developer',
+    role:    'Sole engineer — architecture to release',
     premise:
-      'The software a town hall runs on. Nine of its offices — records, HR and payroll, the supply room, the pharmacy, the health centre, the public employment desk — work out of one system instead of nine sets of folders.',
+      'Nine departments — records, HR and payroll, inventory, pharmacy, clinical records, public employment — running on one API behind a React portal, an iOS and Android app, and two offline-capable Windows applications. Built multi-tenant from the schema up, so the same deployment can serve another organisation without their records ever meeting.',
     facts: [
-      { value: '9',  label: 'offices using it daily' },
-      { value: '3',  label: 'apps, one shared backend' },
+      { value: '9',    label: 'departments in daily production' },
+      { value: '3',    label: 'client apps, one shared API' },
       { value: '1.1k', label: 'assertions before each release' },
+      { value: '48',   label: 'endpoints hardened after review' },
     ],
     highlights: [
       {
-        title: 'A paper trail that can be proved',
-        body: 'Memos route to named offices, get signed, and get acknowledged on the record — every step timestamped and attributable. “We never received that” stops being an argument you can have.',
+        title: 'An audit trail that holds up',
+        body: 'Documents route to named parties, get signed, and get acknowledged on the record — every step timestamped and attributable, so “we never received that” stops being an argument anyone can have.',
       },
       {
-        title: 'Documents anyone can check',
-        body: 'Each issued PDF is attested over an Ed25519 hash chain, so a recipient outside the LGU can test it for tampering without an account, a login, or a phone call to me.',
+        title: 'Tamper-evident documents, verifiable by anyone',
+        body: 'Each issued PDF is attested over an Ed25519 hash chain, so a third party outside the organisation can test it for tampering with no account, no login, and no call to me.',
       },
       {
         title: 'Signing on a phone, without guessing',
         body: 'The server rasterises each page and the app lays the signature boxes over it exactly where the stamp will land — nobody signs a document they have not actually read.',
       },
       {
-        title: 'Counters that stay open',
-        body: 'Two Windows programs keep the stockroom and the pharmacy serving people with no connection at all, then reconcile by record identity so a repeated sync can never double a transaction.',
+        title: 'Point-of-service that survives an outage',
+        body: 'Two Windows applications keep inventory and dispensing running with no connection at all, then reconcile by record identity on reconnect — so a repeated sync can never double a transaction.',
       },
       {
-        title: 'Forty-eight doors that were unlocked',
-        body: 'I led the review that found endpoints trusting whatever identity the client claimed, closed them, and re-tested each one against production rather than calling it fixed.',
+        title: 'Forty-eight endpoints that trusted the client',
+        body: 'I led the review that found routes accepting whatever identity the caller claimed, closed them, and re-tested each one against production rather than calling it fixed.',
       },
     ],
     stack: ['React 19', 'TypeScript', 'Fastify', 'Prisma', 'PostgreSQL', 'Expo', 'WinForms', 'Ed25519', 'Railway'],
   },
   {
     id:      'survey',
-    name:    'Field Survey & Records Platform',
-    client:  'Private client · Marinduque',
+    name:    'Offline-First Field Data Platform',
+    client:  'Private client',
     period:  '2024 — 2025',
     status:  'shipped',
     role:    'Full-stack developer',
     premise:
-      'A records and interviewing platform for teams working where there is no mobile signal — the office plans and publishes from a browser, the field carries everything it needs on the phone.',
+      'A records and data-collection platform for teams operating with no connectivity at all. The office plans, publishes and reconciles from a browser; the field carries a complete working copy on the handset and syncs when it can. One Fastify and Prisma API over PostgreSQL serving both.',
     facts: [
       { value: '28,899', label: 'records mirrored to a phone' },
       { value: '0',      label: 'duplicated, 0 missed' },
@@ -150,7 +182,7 @@ export const projects: Project[] = [
     ],
     highlights: [
       {
-        title: 'A whole municipality, on the device',
+        title: 'Tens of thousands of records, on the device',
         body: 'Records mirror into on-device SQLite in batches, written by identity — so an interrupted download resumes instead of duplicating. Proved across 28,899 records in 15 pages: nothing doubled, nothing lost.',
       },
       {
@@ -208,17 +240,17 @@ export const personalProjects: PersonalProject[] = [
     status: 'In progress',
     motif:  'ledger',
     blurb:
-      'A double-entry ledger for a municipal accounting office, written to the COA Government Accounting Manual for LGUs — with the balance invariants enforced by the database rather than trusted to the app.',
+      'A double-entry accounting system built to a statutory standard, with the balance invariants enforced by database constraints rather than trusted to application code — so the books cannot be put out of balance by a bug.',
     stack: ['Tauri', 'Rust', 'PostgreSQL', 'TypeScript'],
   },
   {
     id:     'form-builder',
-    name:   'Barangay Forms',
+    name:   'Distributed Forms & E-Signature',
     year:   '2026',
     status: 'Live',
     motif:  'form',
     blurb:
-      'The municipality designs a form once and publishes it to every barangay, then watches who has filled it in, signed it and acknowledged it — with announcements and messaging in the same place.',
+      'An organisation designs a form once and publishes it to every unit beneath it, then tracks who has completed, signed and acknowledged it — with announcements and messaging in the same place, and each unit scoped to its own submissions.',
     stack: ['React', 'dnd-kit', 'pdf-lib', 'pdf.js', 'Supabase', 'Recharts'],
   },
   {
@@ -238,7 +270,7 @@ export const personalProjects: PersonalProject[] = [
     status: 'In progress',
     motif:  'feed',
     blurb:
-      'A members-only space for a local organisation — an activity feed, a directory that groups members by town and barangay, and profiles people actually keep up to date.',
+      'A members-only social space — an activity feed, a directory that groups people by region and chapter, and profiles members actually keep up to date.',
     stack: ['Expo SDK 57', 'Expo Router', 'Supabase', 'Zustand', 'Zod'],
   },
 ]
@@ -266,9 +298,9 @@ export const problems: Problem[] = [
   {
     id:      'reminder-flood',
     tag:     'Blast radius',
-    title:   'The sweep that would have flooded the town',
+    title:   'The sweep that would have flooded every inbox',
     problem:
-      'Run once uncapped, the first reminder pass would have mailed three months of dead paperwork to every signatory on deploy morning.',
+      'Run once uncapped, the first reminder pass would have mailed three months of dead paperwork to every signatory in the organisation on deploy morning.',
     solution:
       'An age ceiling, plus pacing held in the database rather than the scheduler. Anything unsigned that long is waiting on a decision, not a nudge — so reminders stay something people read.',
   },

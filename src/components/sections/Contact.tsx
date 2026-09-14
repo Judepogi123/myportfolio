@@ -130,9 +130,9 @@ export function Contact() {
             <div className="bg-canvas px-5 py-5">
               <dt className="label">Location</dt>
               <dd className="mt-2 text-sm font-medium text-ink">
-                Boac, Marinduque
+                Philippines · GMT+8
                 <span className="mt-0.5 block text-xs font-normal text-ink-faint">
-                  Philippines · {identity.availability}
+                  {identity.availability}
                 </span>
               </dd>
             </div>

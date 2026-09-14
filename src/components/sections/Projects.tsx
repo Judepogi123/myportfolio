@@ -110,7 +110,7 @@ export function Projects() {
       id="projects"
       index="04"
       title="Things nobody asked me to build"
-      lead="Side projects — where I try the idea before it has to survive a municipal office."
+      lead="Side projects — where I try an idea before it has to survive real users."
     >
       <ul className="grid gap-4 sm:gap-5 md:grid-cols-2">
         {personalProjects.map((project, i) => (
