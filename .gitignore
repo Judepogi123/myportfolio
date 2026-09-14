@@ -13,6 +13,11 @@ dist-ssr
 *.local
 screenshots
 
+# Secrets — .env.example is the tracked template
+.env
+.env.*
+!.env.example
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

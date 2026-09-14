@@ -15,11 +15,14 @@ export type Identity = {
   lead: string
 }
 
+/* Set VITE_CONTACT_EMAIL in .env to change the address everywhere it appears. */
+const CONTACT_EMAIL = import.meta.env.VITE_CONTACT_EMAIL ?? 'talkto@thatonedev.com'
+
 export const identity: Identity = {
   name:         'Jude Demnuvar L. Ribleza',
   shortName:    'Jude Ribleza',
   role:         'Full-Stack Developer',
-  email:        'juderibleza36@gmail.com',
+  email:        CONTACT_EMAIL,
   phone:        '+63 930 432 0169',
   city:         'Boac, Marinduque, Philippines',
   availability: 'Open to remote work',

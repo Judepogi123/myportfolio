@@ -101,12 +101,15 @@ const SECTIONS = ['about', 'work', 'problems', 'toolkit', 'contact']
   // Copy button.
   await page.locator('a[href="#contact"]').first().click()
   await page.waitForTimeout(900)
+  // Compare against the address the page actually renders rather than a
+  // literal, so changing VITE_CONTACT_EMAIL does not break this check.
+  const shown = await page.locator('#contact-email').innerText()
   await page.getByRole('button', { name: 'Copy address' }).click()
   await page.waitForTimeout(300)
   const clip = await page.evaluate(() => navigator.clipboard.readText())
-  clip === 'juderibleza36@gmail.com'
-    ? pass('contact: copies the address')
-    : fail('contact: copies the address', `got "${clip}"`)
+  clip === shown.trim() && clip.includes('@')
+    ? pass('contact: copies the address', clip)
+    : fail('contact: copies the address', `copied "${clip}", shown "${shown}"`)
   ;(await page.getByRole('button', { name: 'Copied' }).isVisible())
     ? pass('contact: shows copied feedback')
     : fail('contact: copied feedback', 'no label')
