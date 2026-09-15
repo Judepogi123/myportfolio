@@ -106,6 +106,53 @@ const SECTIONS = ['about', 'work', 'problems', 'projects', 'toolkit', 'contact']
   }
 
   /*
+   * The scroll-brightened prose. Its failure mode is text that never finishes
+   * lightening — a paragraph left permanently at 28% opacity, which reads as
+   * broken rather than stylish. After scrolling past, every word must be full.
+   */
+  {
+    await page.evaluate(async () => {
+      document.documentElement.style.scrollBehavior = 'auto'
+      const about = document.getElementById('about')
+      about?.scrollIntoView({ block: 'start' })
+      await new Promise((r) => setTimeout(r, 300))
+      window.scrollBy(0, about?.getBoundingClientRect().height ?? 1200)
+      await new Promise((r) => setTimeout(r, 900))
+    })
+
+    const dim = await page.evaluate(() =>
+      [...document.querySelectorAll('#about span')]
+        .filter((el) => {
+          const opacity = Number(getComputedStyle(el).opacity)
+          return opacity > 0 && opacity < 0.9 && (el.textContent ?? '').trim().length > 1
+        })
+        .map((el) => (el.textContent ?? '').trim())
+        .slice(0, 5),
+    )
+
+    dim.length === 0
+      ? pass('scroll prose: every word reaches full opacity')
+      : fail('scroll prose: words left dim after scrolling past', dim.join(' '))
+
+    /*
+     * Splitting a paragraph into per-word spans is an easy way to lose the
+     * spaces between them — a flex container collapses them and the text
+     * renders as one unreadable run. Catch it by looking for improbably long
+     * unbroken strings.
+     */
+    const runTogether = await page.evaluate(() =>
+      [...document.querySelectorAll('#about p')]
+        .map((p) => (p.textContent ?? '').trim())
+        .filter((text) => /\S{34,}/.test(text))
+        .map((text) => text.slice(0, 60)),
+    )
+
+    runTogether.length === 0
+      ? pass('scroll prose: words keep their spaces')
+      : fail('scroll prose: words keep their spaces', runTogether.join(' | '))
+  }
+
+  /*
    * Collapsible sections. The trap here is a panel that is visually closed but
    * still in the accessibility tree — screen readers read it, Tab lands in it,
    * ctrl+F finds it. Every closed panel must be inert, every open one must not.
@@ -361,6 +408,17 @@ const SECTIONS = ['about', 'work', 'problems', 'projects', 'toolkit', 'contact']
   hidden === 0
     ? pass('reduced motion: everything is visible')
     : fail('reduced motion: everything is visible', `${hidden} elements at opacity 0`)
+
+  /* With reduced motion the prose must be plain text, not per-word spans. */
+  const splitWords = await page.evaluate(
+    () =>
+      [...document.querySelectorAll('#about p')].filter(
+        (p) => p.querySelectorAll('span').length > 5,
+      ).length,
+  )
+  splitWords === 0
+    ? pass('reduced motion: prose renders as plain paragraphs')
+    : fail('reduced motion: prose renders as plain paragraphs', `${splitWords} still split`)
 
   const headings = await page.evaluate(() =>
     [...document.querySelectorAll('h1,h2,h3,h4')].map((h) => h.tagName),
