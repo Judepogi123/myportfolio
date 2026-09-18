@@ -48,6 +48,8 @@ const SECTIONS = ['about', 'work', 'problems', 'projects', 'toolkit', 'contact']
       .filter((el) => {
         const style = getComputedStyle(el)
         if (style.position !== 'fixed' && style.position !== 'sticky') return false
+        // Decorative overlays cannot cover anything they do not take clicks for.
+        if (style.pointerEvents === 'none') return false
         const box = el.getBoundingClientRect()
         return box.height > 8 && box.top < 60
       })
@@ -91,7 +93,17 @@ const SECTIONS = ['about', 'work', 'problems', 'projects', 'toolkit', 'contact']
         motif: getComputedStyle(el.querySelector('svg')).color,
       }))
     const resting = await read()
-    await card.hover()
+
+    /*
+     * Move the real mouse to the card's measured centre rather than using
+     * locator.hover(). hover() re-resolves the element's position through its
+     * own actionability pass, and while the entrance animations are still
+     * settling it can aim at a stale box and land on nothing.
+     */
+    const box = await card.boundingBox()
+    if (box) {
+      await page.mouse.move(Math.round(box.x + box.width / 2), Math.round(box.y + box.height / 2))
+    }
     await page.waitForTimeout(800)
     const hovered = await read()
 
@@ -103,6 +115,135 @@ const SECTIONS = ['about', 'work', 'problems', 'projects', 'toolkit', 'contact']
         )
 
     await page.mouse.move(0, 0)
+  }
+
+  /*
+   * The typewriter loops: type, hold, erase, retype. Assert it both reaches
+   * the full string and shrinks again — an earlier check compared against the
+   * complete text once, which now lands mid-erase and fails at random.
+   *
+   * The untouched copy for screen readers matters more than any of it.
+   */
+  {
+    const lengths = []
+    let sawFullString = false
+
+    for (let i = 0; i < 34; i += 1) {
+      const text = await page.evaluate(
+        () =>
+          document
+            .querySelector('a[href="#top"] span[aria-hidden]')
+            ?.textContent?.trim() ?? '',
+      )
+      if (text === 'full-stack-developer') sawFullString = true
+      lengths.push(text.length)
+      await page.waitForTimeout(200)
+    }
+
+    let grew = false
+    let shrank = false
+    for (let i = 1; i < lengths.length; i += 1) {
+      if (lengths[i] > lengths[i - 1]) grew = true
+      if (lengths[i] < lengths[i - 1]) shrank = true
+    }
+
+    const forScreenReaders = await page.evaluate(
+      () => document.querySelector('a[href="#top"] .sr-only')?.textContent?.trim() ?? '',
+    )
+
+    sawFullString && grew && shrank && forScreenReaders === 'full-stack-developer'
+      ? pass('typewriter: loops, and reads correctly to assistive tech')
+      : fail(
+          'typewriter: loops',
+          `full=${sawFullString} grew=${grew} shrank=${shrank} sr="${forScreenReaders}"`,
+        )
+  }
+
+  /*
+   * The ghost numeral behind each section heading is the parallax a visitor
+   * can actually see — the dot grid moves too, but at fifteen percent opacity
+   * nobody can tell. If this stops moving, the effect is effectively gone.
+   */
+  {
+    const ghostY = async (scrollTarget) => {
+      await page.evaluate((y) => {
+        document.documentElement.style.scrollBehavior = 'auto'
+        window.scrollTo({ top: y, behavior: 'instant' })
+      }, scrollTarget)
+      await page.waitForTimeout(400)
+      return page.evaluate(() => {
+        const el = document.querySelector('#work header .will-change-transform')
+        if (!el) return null
+        return Math.round(new DOMMatrixReadOnly(getComputedStyle(el).transform).f)
+      })
+    }
+
+    const workTop = await page.evaluate(
+      () => Math.round(document.getElementById('work').getBoundingClientRect().top + window.scrollY),
+    )
+    const before = await ghostY(Math.max(0, workTop - 600))
+    const after = await ghostY(workTop + 200)
+
+    before !== null && after !== null && Math.abs(after - before) > 15
+      ? pass('parallax: section numeral drifts against the page', `${before}px -> ${after}px`)
+      : fail('parallax: section numeral drifts', `${before} -> ${after}`)
+  }
+
+  /*
+   * Parallax. This silently did nothing once already — useScroll resolved the
+   * enclosing overflow-hidden section as its scroll container and pinned
+   * progress at zero, which looks exactly like a page with no effect at all.
+   * Assert the layers actually move, and move by different amounts.
+   */
+  {
+    const translateY = (selector) =>
+      page.evaluate((sel) => {
+        const el = document.querySelector(sel)
+        if (!el) return null
+        const matrix = new DOMMatrixReadOnly(getComputedStyle(el).transform)
+        return Math.round(matrix.f)
+      }, selector)
+
+    /*
+     * Setting scrollTop and reading straight back is unreliable here — the
+     * position sometimes has not settled by the time the next evaluate runs,
+     * which made this check compare two identical clamped values and "pass"
+     * a completely static page. Wait until the browser agrees where it is.
+     */
+    const scrollToY = async (target) => {
+      await page.evaluate((y) => {
+        document.documentElement.style.scrollBehavior = 'auto'
+        window.scrollTo({ top: y, behavior: 'instant' })
+      }, target)
+
+      for (let attempt = 0; attempt < 20; attempt += 1) {
+        const at = await page.evaluate(() => Math.round(window.scrollY))
+        if (Math.abs(at - target) <= 2) return at
+        await page.waitForTimeout(100)
+      }
+      return page.evaluate(() => Math.round(window.scrollY))
+    }
+
+    await scrollToY(0)
+    await page.waitForTimeout(400)
+    const restGrid = await translateY('#top .dot-grid')
+    const restContent = await translateY('#top .dot-grid + div')
+
+    await scrollToY(600)
+    await page.waitForTimeout(600)
+    const movedGrid = await translateY('#top .dot-grid')
+    const movedContent = await translateY('#top .dot-grid + div')
+
+    const gridMoved = Math.abs((movedGrid ?? 0) - (restGrid ?? 0)) > 20
+    const contentMoved = Math.abs((movedContent ?? 0) - (restContent ?? 0)) > 10
+    const differentRates = Math.abs((movedGrid ?? 0) - (movedContent ?? 0)) > 20
+
+    gridMoved && contentMoved && differentRates
+      ? pass('parallax: layers move at different rates', `grid ${movedGrid}px, copy ${movedContent}px`)
+      : fail(
+          'parallax: layers move at different rates',
+          `grid ${restGrid}->${movedGrid}, copy ${restContent}->${movedContent}`,
+        )
   }
 
   /*
@@ -328,8 +469,20 @@ const SECTIONS = ['about', 'work', 'problems', 'projects', 'toolkit', 'contact']
   const overflow = await page.evaluate(() => ({
     scrollWidth: document.documentElement.scrollWidth,
     innerWidth: window.innerWidth,
+    /*
+     * Only count elements that actually widen the page. A layer deliberately
+     * scaled past its frame — the parallaxing project covers, say — sticks out
+     * of its own box but is clipped by an ancestor and scrolls nothing.
+     */
     offenders: [...document.querySelectorAll('body *')]
-      .filter((el) => el.getBoundingClientRect().right > window.innerWidth + 1)
+      .filter((el) => {
+        if (el.getBoundingClientRect().right <= window.innerWidth + 1) return false
+        for (let node = el.parentElement; node && node !== document.body; node = node.parentElement) {
+          const overflowX = getComputedStyle(node).overflowX
+          if (overflowX === 'hidden' || overflowX === 'clip') return false
+        }
+        return true
+      })
       .map((el) => el.tagName + '.' + String(el.className).slice(0, 40))
       .slice(0, 5),
   }))
@@ -360,6 +513,31 @@ const SECTIONS = ['about', 'work', 'problems', 'projects', 'toolkit', 'contact']
     : fail('mobile: footer navigation reaches a section', 'did not land')
 
   // Tap targets are big enough to hit with a thumb.
+  /*
+   * The canvas cursor must decline on a touch device. A trail chasing a
+   * pointer that does not exist is a permanently idle rAF loop eating battery
+   * on a phone.
+   */
+  {
+    const painted = await page.evaluate(async () => {
+      const canvas = document.querySelector('canvas')
+      if (!canvas) return 'no canvas'
+      document.dispatchEvent(
+        new PointerEvent('pointermove', { clientX: 120, clientY: 300, bubbles: true }),
+      )
+      await new Promise((r) => setTimeout(r, 300))
+      const ctx = canvas.getContext('2d')
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data
+      let n = 0
+      for (let i = 3; i < data.length; i += 4) if (data[i] > 0) n += 1
+      return n
+    })
+
+    painted === 0 || painted === 'no canvas'
+      ? pass('canvas cursor: stays idle on touch devices')
+      : fail('canvas cursor: stays idle on touch devices', `${painted} pixels painted`)
+  }
+
   const small = await page.evaluate(
     () =>
       [...document.querySelectorAll('a, button')]
@@ -408,6 +586,29 @@ const SECTIONS = ['about', 'work', 'problems', 'projects', 'toolkit', 'contact']
   hidden === 0
     ? pass('reduced motion: everything is visible')
     : fail('reduced motion: everything is visible', `${hidden} elements at opacity 0`)
+
+  /* Reduced motion means the cursor trail must not run either. */
+  {
+    const painted = await page.evaluate(async () => {
+      const canvas = document.querySelector('canvas')
+      if (!canvas) return 'no canvas'
+      for (let i = 0; i < 6; i += 1) {
+        document.dispatchEvent(
+          new PointerEvent('pointermove', { clientX: 200 + i * 60, clientY: 300, bubbles: true }),
+        )
+        await new Promise((r) => setTimeout(r, 60))
+      }
+      const ctx = canvas.getContext('2d')
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data
+      let n = 0
+      for (let i = 3; i < data.length; i += 4) if (data[i] > 0) n += 1
+      return n
+    })
+
+    painted === 0 || painted === 'no canvas'
+      ? pass('canvas cursor: does not run under reduced motion')
+      : fail('canvas cursor: does not run under reduced motion', `${painted} pixels painted`)
+  }
 
   /* With reduced motion the prose must be plain text, not per-word spans. */
   const splitWords = await page.evaluate(

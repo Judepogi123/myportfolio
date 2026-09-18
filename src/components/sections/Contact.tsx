@@ -1,5 +1,6 @@
 import { ArrowUpRight, Copy, Check } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { Parallax } from '@/components/ui/Parallax'
 import { Reveal } from '@/components/ui/Reveal'
 import { ContactForm } from '@/components/contact/ContactForm'
 import { contactLinks, identity } from '@/data/profile'
@@ -56,10 +57,13 @@ function CopyEmailButton() {
 export function Contact() {
   return (
     <section id="contact" className="relative overflow-hidden border-t border-line">
-      <div
-        aria-hidden
-        className="dot-grid pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_top,black,transparent_72%)]"
-      />
+      {/* Same lag as the hero, so the page opens and closes on the same note. */}
+      <Parallax distance={110} className="pointer-events-none absolute -inset-y-28 inset-x-0">
+        <div
+          aria-hidden
+          className="dot-grid size-full [mask-image:linear-gradient(to_top,black,transparent_72%)]"
+        />
+      </Parallax>
 
       <div className="relative mx-auto w-full max-w-6xl px-5 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-28">
         <Reveal>

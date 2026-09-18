@@ -1,5 +1,39 @@
+import { useReducedMotion } from 'motion/react'
 import { identity, navItems } from '@/data/profile'
+import { useTypewriter } from '@/hooks/useTypewriter'
+import { cn } from '@/lib/cn'
 import { ThemeToggle } from './ThemeToggle'
+
+const ROLE_SLUG = identity.role.toLowerCase().replace(/\s+/g, '-')
+
+function TypedRole() {
+  const reduced = useReducedMotion()
+  const { typed } = useTypewriter(ROLE_SLUG, { enabled: !reduced })
+
+  return (
+    /*
+     * Reserved width. The string types and erases on a loop, and letting the
+     * box follow it would drag the whole brand lockup left and right forever.
+     */
+    <span
+      className="hidden font-mono text-xs text-ink-faint sm:inline-block"
+      style={{ minWidth: `${ROLE_SLUG.length}ch` }}
+    >
+      {/* The real text, for screen readers — never the half-typed version. */}
+      <span className="sr-only">{ROLE_SLUG}</span>
+
+      <span aria-hidden className="inline-flex items-center">
+        {typed}
+        <span
+          className={cn(
+            'ml-px inline-block h-[1em] w-[1px] translate-y-[0.1em] bg-accent',
+            reduced ? 'opacity-0' : 'animate-caret',
+          )}
+        />
+      </span>
+    </span>
+  )
+}
 
 /**
  * Sits in the flow at the top of the page and scrolls away with it.
@@ -12,9 +46,7 @@ export function TopBar() {
         <span className="text-sm font-semibold tracking-[-0.01em] text-ink">
           {identity.shortName}
         </span>
-        <span className="hidden font-mono text-xs text-ink-faint sm:inline">
-          {identity.role.toLowerCase().replace(/\s+/g, '-')}
-        </span>
+        <TypedRole />
       </a>
 
       <div className="flex items-center gap-1 sm:gap-2">

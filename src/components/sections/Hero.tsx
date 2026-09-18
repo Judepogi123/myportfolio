@@ -1,9 +1,24 @@
-import { motion, useReducedMotion } from 'motion/react'
+import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react'
 import { ArrowDownRight } from 'lucide-react'
 import { identity } from '@/data/profile'
 
 export function Hero() {
   const reduced = useReducedMotion()
+
+  /*
+   * Three layers leaving at three speeds: the dot grid lags, the copy drifts
+   * up a little faster than the page, and the copy eases off as it goes.
+   *
+   * Driven by raw window scroll rather than useScroll's `target`, because this
+   * section is `overflow-hidden` — which useScroll picks as the scroll
+   * container, leaving progress pinned at zero. The hero always starts at the
+   * top of the document, so scrollY in pixels is the honest input anyway.
+   */
+  const { scrollY } = useScroll()
+
+  const gridY = useTransform(scrollY, [0, 900], [0, 120], { clamp: true })
+  const contentY = useTransform(scrollY, [0, 900], [0, -60], { clamp: true })
+  const contentOpacity = useTransform(scrollY, [0, 700], [1, 0.3], { clamp: true })
 
   const rise = (delay: number) => ({
     initial: { opacity: 0, y: reduced ? 0 : 22 },
@@ -17,12 +32,17 @@ export function Hero() {
 
   return (
     <section id="top" className="relative overflow-hidden">
-      <div
+      <motion.div
         aria-hidden
-        className="dot-grid pointer-events-none absolute inset-0 [mask-image:linear-gradient(to_bottom,black,transparent_72%)]"
+        style={reduced ? undefined : { y: gridY }}
+        // -inset-y covers the gap the drift would otherwise open at the edges.
+        className="dot-grid pointer-events-none absolute -inset-y-32 inset-x-0 will-change-transform [mask-image:linear-gradient(to_bottom,black,transparent_72%)]"
       />
 
-      <div className="relative mx-auto w-full max-w-6xl px-5 pb-18 pt-18 sm:px-8 sm:pb-24 sm:pt-24 lg:px-12 lg:pb-28 lg:pt-28">
+      <motion.div
+        style={reduced ? undefined : { y: contentY, opacity: contentOpacity }}
+        className="relative mx-auto w-full max-w-6xl px-5 pb-18 pt-18 will-change-transform sm:px-8 sm:pb-24 sm:pt-24 lg:px-12 lg:pb-28 lg:pt-28"
+      >
         <motion.p {...rise(0)} className="label">
           {identity.role} · Web, mobile &amp; desktop
         </motion.p>
@@ -89,7 +109,7 @@ export function Hero() {
         >
           {identity.city} · {identity.availability}
         </motion.p>
-      </div>
+      </motion.div>
     </section>
   )
 }

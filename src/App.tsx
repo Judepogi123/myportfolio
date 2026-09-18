@@ -1,3 +1,4 @@
+import { CanvasCursor } from '@/components/ui/CanvasCursor'
 import { ScrollProgress } from '@/components/layout/ScrollProgress'
 import { TopBar } from '@/components/layout/TopBar'
 import { Footer } from '@/components/layout/Footer'
@@ -12,6 +13,7 @@ import { Contact } from '@/components/sections/Contact'
 export default function App() {
   return (
     <div className="min-h-dvh bg-canvas">
+      <CanvasCursor />
       <ScrollProgress />
       <TopBar />
 

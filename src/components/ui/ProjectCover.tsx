@@ -1,4 +1,5 @@
 import { cn } from '@/lib/cn'
+import { Parallax } from './Parallax'
 
 export type Motif = 'device' | 'ledger' | 'form' | 'sync' | 'feed'
 
@@ -102,10 +103,17 @@ export function ProjectCover({ motif, src, alt, className }: ProjectCoverProps) 
   }
 
   return (
-    <div
+    // A span, not a div: these covers sit inside a <button>, whose content
+    // model only allows phrasing content.
+    <span
       aria-hidden
-      className={cn('dot-grid relative size-full overflow-hidden bg-raised/50', className)}
+      className={cn('dot-grid relative block size-full overflow-hidden bg-raised/50', className)}
     >
+      {/*
+        The motif drifts inside its frame as the card scrolls. scale-125 gives
+        it room to move without exposing an edge.
+      */}
+      <Parallax as="span" distance={44} className="absolute inset-0 block scale-125">
       <svg
         viewBox="0 0 240 150"
         fill="none"
@@ -117,6 +125,7 @@ export function ProjectCover({ motif, src, alt, className }: ProjectCoverProps) 
       >
         {motifs[motif]}
       </svg>
-    </div>
+      </Parallax>
+    </span>
   )
 }
